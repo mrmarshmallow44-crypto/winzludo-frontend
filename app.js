@@ -5,7 +5,7 @@ const app = document.getElementById("app");
 // Load a page dynamically
 async function loadPage(page) {
     try {
-        let res = await fetch(page + ".html");
+        let res = await fetch("./" + page + ".html");  // <-- FIXED HERE
         let html = await res.text();
         app.innerHTML = html;
     } catch (e) {
