@@ -1,0 +1,90 @@
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./style.css">
+
+<div class="container">
+    <h2>Profile</h2>
+
+    <div class="tx-card">
+        <p><b>Name:</b> <span id="p-name">Loading...</span></p>
+        <p><b>Email:</b> <span id="p-email">Loading...</span></p>
+        <p><b>KYC:</b> <span id="p-kyc">Loading...</span></p>
+        <p><b>Wallet:</b> ₹<span id="p-wallet">0</span></p>
+    </div>
+
+    <h3 style="margin-top:20px;">Update Details</h3>
+    <input id="newName" placeholder="New Name" />
+    <input id="newEmail" placeholder="New Email" />
+    <button onclick="updateProfile()">Update</button>
+
+    <button class="back-btn" onclick="goDashboard()">Back</button>
+</div>
+
+<script>
+const API = "https://winzludo-backend-b0uk.onrender.com/api";
+async function loadProfile() {
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || !user._id) {
+        alert("Please login again");
+        goAuth();
+        return;
+    }
+
+    try {
+        let res = await fetch(`${API}/user/${user._id}`);
+        let data = await res.json();
+
+        if (!res.ok) {
+            alert("Failed to load profile");
+            return;
+        }
+
+        // Show in UI
+        document.getElementById("p-name").innerText = data.name;
+        document.getElementById("p-email").innerText = data.email;
+        document.getElementById("p-kyc").innerText = data.kycStatus;
+        document.getElementById("p-wallet").innerText = data.wallet;
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+
+async function updateProfile() {
+    let user = JSON.parse(localStorage.getItem("user"));
+    let name = document.getElementById("newName").value;
+    let email = document.getElementById("newEmail").value;
+
+    if (!name && !email) {
+        return alert("Enter new name or email");
+    }
+
+    try {
+        let res = await fetch(`${API}/user/update/${user._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email })
+        });
+
+        let data = await res.json();
+
+        if (!res.ok) return alert(data.message || "Update failed");
+
+        alert("Profile updated successfully!");
+
+        // Update local user data
+        if (name) user.name = name;
+        if (email) user.email = email;
+
+        localStorage.setItem("user", JSON.stringify(user));
+
+        goProfile(); // reload page
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+
+// Auto-load profile
+loadProfile();
+</script>

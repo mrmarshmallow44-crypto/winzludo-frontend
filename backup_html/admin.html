@@ -1,0 +1,113 @@
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./style.css">
+
+<div class="container">
+    <h2>Admin Login</h2>
+
+    <input id="adminEmail" placeholder="Email" />
+    <input id="adminPass" type="password" placeholder="Password" />
+
+    <button onclick="adminLogin()">Login</button>
+    <button class="back-btn" onclick="goAuth()">Back</button>
+</div>
+
+<script>
+const API = "https://winzludo-backend-b0uk.onrender.com/api";
+const app = document.getElementById("app");
+
+// --------------------------- ADMIN LOGIN -----------------------------
+async function adminLogin() {
+    let email = document.getElementById("adminEmail").value;
+    let pass  = document.getElementById("adminPass").value;
+
+    if (!email || !pass) {
+        alert("Enter admin email & password");
+        return;
+    }
+
+    try {
+        let res = await fetch(API + "/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password: pass })
+        });
+
+        let data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Invalid Admin credentials");
+            return;
+        }
+
+        localStorage.setItem("adminToken", data.token);
+        alert("Admin Login Successful!");
+        loadAdminDashboard();
+
+    } catch (err) {
+        alert("Network Error");
+    }
+}
+
+// --------------------------- ADMIN DASHBOARD -----------------------------
+function loadAdminDashboard() {
+    app.innerHTML = `
+        <div class='container'>
+            <h2>Admin Dashboard</h2>
+
+            <button onclick='showUsers()'>Users</button>
+            <button onclick='showKyc()'>KYC Requests</button>
+            <button onclick='showWithdraw()'>Withdraw Requests</button>
+            <button onclick='showTransactions()'>Transactions</button>
+
+            <button class='back-btn' onclick='goAuth()'>Logout</button>
+        </div>`;
+}
+
+// --------------------------- USERS LIST -----------------------------
+function showUsers() {
+    app.innerHTML = `
+        <div class='container'>
+            <h2>Users</h2>
+            <div class='tx-card'>
+                <p>User list will appear here (demo)</p>
+            </div>
+            <button class='back-btn' onclick='loadAdminDashboard()'>Back</button>
+        </div>`;
+}
+
+// --------------------------- KYC LIST -----------------------------
+function showKyc() {
+    app.innerHTML = `
+        <div class='container'>
+            <h2>KYC Requests</h2>
+            <div class='tx-card'>
+                <p>KYC list will appear here (demo)</p>
+            </div>
+            <button class='back-btn' onclick='loadAdminDashboard()'>Back</button>
+        </div>`;
+}
+
+// --------------------------- WITHDRAW LIST -----------------------------
+function showWithdraw() {
+    app.innerHTML = `
+        <div class='container'>
+            <h2>Withdraw Requests</h2>
+            <div class='tx-card'>
+                <p>Withdraw list will appear here (demo)</p>
+            </div>
+            <button class='back-btn' onclick='loadAdminDashboard()'>Back</button>
+        </div>`;
+}
+
+// --------------------------- TRANSACTIONS LIST -----------------------------
+function showTransactions() {
+    app.innerHTML = `
+        <div class='container'>
+            <h2>Transactions</h2>
+            <div class='tx-card'>
+                <p>Transactions list will appear here (demo)</p>
+            </div>
+            <button class='back-btn' onclick='loadAdminDashboard()'>Back</button>
+        </div>`;
+}
+</script>
