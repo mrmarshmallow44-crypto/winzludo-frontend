@@ -1,0 +1,150 @@
+<div class="container">
+    <h2>Wallet</h2>
+
+    <div class="tx-card">
+        <h3>Balance</h3>
+        <p id="wallet-bal">₹0</p>
+    </div>
+
+    <button onclick="loadAddCash()">Add Cash</button>
+    <button onclick="loadWithdraw()">Withdraw</button>
+    <button onclick="loadTransactions()">Transactions</button>
+    <button class="back-btn" onclick="goDashboard()">Back</button>
+</div>
+
+<script>
+const API = "https://winzludo-backend-b0uk.onrender.com/api";
+async function loadWalletBalance() {
+    let user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user._id) {
+        alert("Please login again");
+        goAuth();
+        return;
+    }
+
+    try {
+        let res = await fetch(`${API}/wallet/${user._id}`);
+        let data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Failed to load balance");
+            return;
+        }
+
+        document.getElementById("wallet-bal").innerText = "₹" + data.balance;
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+
+function loadAddCash() {
+    app.innerHTML = `
+    <div class='container'>
+        <h2>Add Cash</h2>
+        <input id='addAmt' type='number' placeholder='Enter Amount'/>
+        <button onclick='confirmAddCash()'>Add Now</button>
+        <button class='back-btn' onclick='goWallet()'>Back</button>
+    </div>`;
+}
+
+async function confirmAddCash() {
+    let amt = document.getElementById("addAmt").value;
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if (amt <= 0) return alert("Enter valid amount");
+
+    try {
+        let res = await fetch(`${API}/wallet/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user._id, amount: amt })
+        });
+
+        let data = await res.json();
+        if (!res.ok) return alert(data.message || "Failed");
+
+        alert("Cash added successfully!");
+        goWallet();
+
+    } catch {
+        alert("Network error");
+    }
+}
+
+function loadWithdraw() {
+    app.innerHTML = `
+    <div class='container'>
+        <h2>Withdraw</h2>
+        <input id='wAmt' type='number' placeholder='Amount'/>
+        <input id='upi' placeholder='UPI ID (example@upi)'/>
+        <button onclick='confirmWithdraw()'>Withdraw</button>
+        <button class='back-btn' onclick='goWallet()'>Back</button>
+    </div>`;
+}
+
+async function confirmWithdraw() {
+    let amt = document.getElementById("wAmt").value;
+    let upi = document.getElementById("upi").value;
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if (amt <= 0 || !upi) return alert("Enter valid details");
+
+    try {
+        let res = await fetch(`${API}/wallet/withdraw`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: user._id, amount: amt, upi })
+        });
+
+        let data = await res.json();
+        if (!res.ok) return alert(data.message || "Failed");
+
+        alert("Withdraw request submitted!");
+        goWallet();
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+
+function loadTransactions() {
+    app.innerHTML = `
+    <div class='container'>
+        <h2>Transactions</h2>
+        <div id='tx-list'></div>
+        <button class='back-btn' onclick='goWallet()'>Back</button>
+    </div>`;
+
+    loadTxList();
+}
+
+async function loadTxList() {
+    let user = JSON.parse(localStorage.getItem("user"));
+    let box = document.getElementById("tx-list");
+
+    try {
+        let res = await fetch(`${API}/wallet/transactions/${user._id}`);
+        let data = await res.json();
+
+        if (!res.ok) {
+            box.innerHTML = "<p>No transactions found</p>";
+            return;
+        }
+
+        box.innerHTML = data.transactions
+            .map(t => `
+                <div class='tx-card'>
+                    <p><b>${t.type.toUpperCase()}</b> – ₹${t.amount}</p>
+                    <p>${new Date(t.date).toDateString()}</p>
+                </div>
+            `)
+            .join("");
+
+    } catch {
+        box.innerHTML = "<p>Error loading transactions</p>";
+    }
+}
+
+loadWalletBalance();
+</script>

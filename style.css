@@ -1,0 +1,52 @@
+/* MAIN THEME */
+body {
+    background: #070814;
+    color: #f9fafb;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* MAIN CONTAINER */
+.container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #121325;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(123, 92, 255, 0.2);
+}
+
+/* INPUT + BUTTON UI */
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    background: #7b5cff;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    opacity: 0.8;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: #181a30 !important;
+    color: #fff;
+}
+
+/* TRANSACTION / LIST CARDS */
+.tx-card {
+    background: #181a30;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+}

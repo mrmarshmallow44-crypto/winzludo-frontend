@@ -1,0 +1,47 @@
+<div class="container">
+    <h2>Dashboard</h2>
+
+    <div class="tx-card">
+        <h3>Wallet Balance</h3>
+        <p id="balance">₹1200</p>
+    </div>
+
+    <button onclick="goWallet()">Wallet</button>
+    <button onclick="goKyc()">KYC</button>
+    <button onclick="goProfile()">Profile</button>
+    <button class="back-btn" onclick="goAuth()">Logout</button>
+</div>
+
+<script>
+const API = "https://winzludo-backend-b0uk.onrender.com/api";
+async function loadDashboard() {
+
+    // Get logged-in user from localStorage
+    let user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user._id) {
+        alert("Please login again");
+        goAuth();
+        return;
+    }
+
+    try {
+        // Fetch the wallet balance from backend
+        let res = await fetch(`${API}/wallet/${user._id}`);
+        let data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Failed to load balance");
+            return;
+        }
+
+        // UPDATE BALANCE UI
+        document.getElementById("balance").innerText = "₹" + data.balance;
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+
+// Run automatically when dashboard opens
+loadDashboard();
+</script>

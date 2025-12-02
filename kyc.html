@@ -1,0 +1,60 @@
+<div class="container">
+    <h2>KYC Verification</h2>
+
+    <p>Upload ID Front:</p>
+    <input id="front" type="file" accept="image/*" />
+
+    <p>Upload ID Back:</p>
+    <input id="back" type="file" accept="image/*" />
+
+    <p>Upload Selfie:</p>
+    <input id="selfie" type="file" accept="image/*" />
+
+    <button onclick="submitKyc()">Submit KYC</button>
+    <button class="back-btn" onclick="goDashboard()">Back</button>
+</div>
+
+<script>
+const API = "https://winzludo-backend-b0uk.onrender.com/api";
+async function submitKyc() {
+    let f1 = document.getElementById("front").files[0];
+    let f2 = document.getElementById("back").files[0];
+    let f3 = document.getElementById("selfie").files[0];
+
+    if (!f1 || !f2 || !f3) {
+        return alert("Please upload all 3 files.");
+    }
+
+    let user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user._id) {
+        alert("Please login again");
+        goAuth();
+        return;
+    }
+
+    try {
+        let form = new FormData();
+        form.append("front", f1);
+        form.append("back", f2);
+        form.append("selfie", f3);
+
+        let res = await fetch(`${API}/kyc/${user._id}`, {
+            method: "POST",
+            body: form
+        });
+
+        let data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "KYC submission failed");
+            return;
+        }
+
+        alert("KYC submitted successfully!");
+        goDashboard();
+
+    } catch (err) {
+        alert("Network error");
+    }
+}
+</script>
